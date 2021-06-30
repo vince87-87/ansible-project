@@ -1,2 +1,18 @@
 ---
-# tasks file for nginx
+- name: Add mappings to /etc/hosts
+  blockinfile:
+    path: /etc/hosts
+    block: |
+      {{ item.ip }} {{ item.name }}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
+  with_items:
+    - { name: web1, ip: 10.10.1.10 }
+    - { name: web2, ip: 10.10.1.11 }
+    - { name: nginx, ip: 10.10.1.12 }
+
+- name: ensure nginx is at the latest version
+  become: true
+  apt:
+    name: nginx
+    state: latest
+    notify: restart nginx
